@@ -1,0 +1,103 @@
+{
+    "2025-03-24": [
+      {
+        "location": "PURI",
+        "date": "Mon, 24 Mar",
+        "time": "08:30 - 18:30",
+        "duration": "12h",
+        "clockIn": "08:30",
+        "clockOut": "20:30",
+        
+        "break": "32 mins"
+      },
+      {
+        "location": "PURI",
+        "date": "Tue, 25 Mar",
+        "time": "08:30 - 18:30",
+        "duration": "10h 2m",
+        "clockIn": "08:28",
+        "clockOut": "18:30",
+        "break": "32 mins"
+      }
+    ],
+    "2025-03-31": [
+      {
+        "location": "PURI",
+        "date": "Tue, 01 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "10h 14m",
+        "clockIn": "09:46",
+        "clockOut": "20:00",
+        
+        "break": "31 mins"
+      }
+    ],
+    "2025-04-07": [
+      {
+        "location": "PURI",
+        "date": "Tue, 08 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "0h 0m",
+        "clockIn": " ",
+        "clockOut": " ",
+              "break": " "
+      }
+    ],
+    "2025-05-07": [
+      {
+        "location": "PURI",
+        "date": "Tue, 08 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "0h 0m",
+        "clockIn": " ",
+        "clockOut": " ",
+        "break": " "
+      }
+    ],
+    "2025-10-07": [
+      {
+        "location": "PURI",
+        "date": "Tue, 08 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "0h 0m",
+        "clockIn": " ",
+        "clockOut": " ",
+        "break": " "
+      }
+    ],
+    "2025-06-08": [
+      {
+        "location": "PURI",
+        "date": "Tue, 08 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "0h 0m",
+        "clockIn": " ",
+        "clockOut": " ",
+        "break": " "
+      }
+    ],
+    "2025-06-07": [
+      {
+        "location": "PURI",
+        "date": "Tue, 08 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "0h 0m",
+        "clockIn": " ",
+        "clockOut": " ",
+        "break": " "
+      }
+    ],
+    "2025-06-09": [
+      {
+        "location": "PURI",
+        "date": "Tue, 08 Apr",
+        "time": "10:00 - 20:00",
+        "duration": "0h 0m",
+        "clockIn": " ",
+        "clockOut": " ",
+        "break": " "
+      }
+    ]
+
+  }
+  

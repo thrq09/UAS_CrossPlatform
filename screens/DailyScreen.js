@@ -57,8 +57,7 @@ const DailyScreen = () => {
           <Text style={styles.date}>{formatDate(todayDate)}</Text>
         </View>
         <View style={styles.icons}>
-          <Icon name="headphones" size={22} style={styles.icon} />
-          <Icon name="bell" size={22} style={styles.icon} />
+          <Icon name="bell" size={22} style={styles.icon}  onPress={() => navigation.navigate("Notification")} />
         </View>
       </View>
 

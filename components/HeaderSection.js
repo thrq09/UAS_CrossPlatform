@@ -10,23 +10,23 @@ const HeaderSection = () => {
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
   const date = today.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.leftSection}>
-        <Text style={styles.greeting}>Hey, User01</Text>
-        <Text style={styles.dateText}>{dayName}, {date}</Text>
-      </View>
+  // return (
+  //   <View style={styles.container}>
+  //     <View style={styles.leftSection}>
+  //       <Text style={styles.greeting}>Hey, User01</Text>
+  //       <Text style={styles.dateText}>{dayName}, {date}</Text>
+  //     </View>
 
-      <View style={styles.iconContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Notification")}>
-          <Icon name="headphones" size={22} color="#333" style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Notification")}>
-          <Icon name="bell" size={22} color="#333" style={styles.icon} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  //     <View style={styles.iconContainer}>
+  //       <TouchableOpacity onPress={() => navigation.navigate("Notification")}>
+  //         <Icon name="headphones" size={22} color="#333" style={styles.icon} />
+  //       </TouchableOpacity>
+  //       <TouchableOpacity onPress={() => navigation.navigate("Notification")}>
+  //         <Icon name="bell" size={22} color="#333" style={styles.icon} />
+  //       </TouchableOpacity>
+  //     </View>
+  //   </View>
+  // );
 };
 
 const styles = StyleSheet.create({

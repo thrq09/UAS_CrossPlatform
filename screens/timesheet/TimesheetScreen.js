@@ -59,7 +59,7 @@ const TimesheetScreen = () => {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No timesheet data for this week.</Text>
+            <Text style={styles.emptyText}>No clock records found for this week.</Text>
           </View>
         )}
       </ScrollView>

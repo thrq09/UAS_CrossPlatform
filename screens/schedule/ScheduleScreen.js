@@ -5,9 +5,6 @@ import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
 
 import ConfirmedShift from "./ConfirmedShift";
-import AvailableShift from "./AvailableShift";
-import MyAvailability from "./MyAvailability";
-import GrabShift from "./GrabShift";
 
 const Tab = createMaterialTopTabNavigator();
 const { width } = Dimensions.get("window");
@@ -31,10 +28,7 @@ const ScheduleScreen = () => {
           tabBarIndicatorStyle: { backgroundColor: "#14A2E2" },
         }}
       >
-        <Tab.Screen name="Confirmed" component={ConfirmedShift} />
-        <Tab.Screen name="Available Shifts" component={AvailableShift} />
-        <Tab.Screen name="My Availabilities" component={MyAvailability} />
-        <Tab.Screen name="Grab" component={GrabShift} />
+        <Tab.Screen name="Your Schedule" component={ConfirmedShift} />
       </Tab.Navigator>
     </View>
   );

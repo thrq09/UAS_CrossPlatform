@@ -1,11 +1,24 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { Avatar, Text, Divider, IconButton } from "react-native-paper";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import {
+  Avatar,
+  Text,
+  Divider,
+  IconButton,
+} from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import useAuthStore from "../../stores/useAuthStore";
+import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+
 import useOrgStore from "../../stores/useOrgStore";
 import OrganisationModal from "./component/OrganisationModal";
-import { useNavigation } from "@react-navigation/native";
+import { useUserStore } from "../../stores/useUserStore"; // ✅ pakai useUserStore
 
 const MenuItem = ({ icon, label, onPress }) => (
   <>
@@ -18,20 +31,36 @@ const MenuItem = ({ icon, label, onPress }) => (
 );
 
 const MoreScreen = () => {
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const navigation = useNavigation();
   const { selectedOrg } = useOrgStore();
   const [modalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation();
+
+  const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
+  const updateProfilePic = useUserStore((state) => state.updateProfilePic);
+
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets?.[0]?.uri) {
+      updateProfilePic(result.assets[0].uri);
+    }
+  };
 
   return (
     <>
       <ScrollView style={styles.container}>
         <View style={styles.userInfo}>
-          <Avatar.Image
-            size={72}
-            source={{ uri: user?.profilePic || "https://i.pravatar.cc/300" }}
-          />
+          <TouchableOpacity onPress={handlePickImage}>
+            <Avatar.Image
+              size={72}
+              source={{ uri: user?.profilePic || "https://i.pravatar.cc/300" }}
+            />
+          </TouchableOpacity>
           <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
           <IconButton
             icon="bell-outline"
@@ -44,9 +73,17 @@ const MoreScreen = () => {
           icon="account"
           label="Profile"
           onPress={() => navigation.navigate("Profile")}
-        />  
-        <MenuItem icon="leaf" label="My Leaves" />
-        <MenuItem icon="file-document" label="My Payslip" />
+        />
+        <MenuItem
+          icon="leaf"
+          label="My Leaves"
+          onPress={() => navigation.navigate("MyLeaves")}
+        />
+        <MenuItem
+          icon="file-document"
+          label="My Payslip"
+          onPress={() => navigation.navigate("MyPayslip")}
+        />
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Your Organisation</Text>
@@ -71,29 +108,31 @@ const MoreScreen = () => {
           </View>
         </View>
         <Divider />
-        
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Others</Text>
         </View>
 
-        <MenuItem icon="heart-pulse" label="Get Location" onPress={() => navigation.navigate("Location")} />
+        <MenuItem
+          icon="heart-pulse"
+          label="Get Location"
+          onPress={() => navigation.navigate("Location")}
+        />
         <MenuItem
           icon="logout"
           label="Logout"
           onPress={() =>
-            Alert.alert(
-              "Logout",
-              "Are you sure you want to logout?",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Yes",
-                  onPress: logout,
-                  style: "destructive",
+            Alert.alert("Logout", "Are you sure you want to logout?", [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Yes",
+                onPress: () => {
+                  setUser({}); // kosongkan user saat logout
+                  navigation.replace("Login");
                 },
-              ],
-              { cancelable: true }
-            )
+                style: "destructive",
+              },
+            ])
           }
         />
 

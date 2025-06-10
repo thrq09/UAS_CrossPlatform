@@ -1,164 +1,136 @@
-import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { Text, Card, Avatar, Divider, Button } from "react-native-paper";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
-const ShiftCard = () => (
-  <Card style={styles.card}>
-    <Card.Content>
-      <View style={styles.header}>
-        <Avatar.Text size={36} label="UMS" style={styles.avatar} />
-        <View style={styles.info}>
-          <Text style={styles.title}>Uki Matcha SCBD</Text>
-          <Text style={styles.subtitle}>Uki Matcha SCBD</Text>
-        </View>
-        <Text style={styles.orgCode}>UMS</Text>
-      </View>
+const confirmedShifts = [
+  {
+    id: '1',
+    date: 'Thu',
+    day: '12',
+    orgName: 'UKI Matcha PURI',
+    orgDesc: 'Uki Matcha Puri',
+    location: 'PURI',
+    time: '08:00 - 16:00',
+    duration: '8h',
+    department: 'Kitchen',
+    shift: 'open kitchen',
+  },
+  {
+    id: '2',
+    date: 'Sat',
+    day: '14',
+    orgName: 'UKI Matcha PURI',
+    orgDesc: 'Uki Matcha Puri',
+    location: 'PURI',
+    time: '12:00 - 20:00',
+    duration: '8h',
+    department: 'Kitchen',
+    shift: 'middle kitchen',
+  },
+];
 
-      <Divider style={styles.divider} />
-
-      <View style={styles.details}>
-        <Text style={styles.shiftTime}>17:00 - 23:00 | 6h</Text>
-        <Text>☕ 30m <Text style={{ fontWeight: "bold" }}>Kitchen</Text></Text>
-        <Text>Shift: <Text style={{ fontWeight: "bold" }}>closing 2</Text></Text>
-      </View>
-    </Card.Content>
-  </Card>
-);
-
-const ConfirmedShift = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  const toggleDropdown = () => setIsExpanded(!isExpanded);
-
+const ConfirmedShiftScreen = () => {
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Add Leave Button */}
-        <TouchableOpacity style={styles.actionsContainer}>
-          <Icon name="plus-circle-outline" size={20} color="#14A2E2" />
-          <Text style={styles.addLeaveText}>Add Leave</Text>
-        </TouchableOpacity>
-
-        {/* THIS WEEK + Toggle */}
-        <View style={styles.weekHeader}>
-          <Text style={styles.weekText}>THIS WEEK</Text>
-          <TouchableOpacity onPress={toggleDropdown}>
-            <Icon name={isExpanded ? "chevron-up" : "chevron-down"} size={24} color="#333" />
-          </TouchableOpacity>
-        </View>
-
-        {/* List of Shifts */}
-        {isExpanded && [...Array(5)].map((_, index) => <ShiftCard key={index} />)}
-      </ScrollView>
-
-      {/* Acknowledge Button */}
-      <View style={styles.acknowledgeContainer}>
-              <TouchableOpacity style={[styles.acknowledgeButton, styles.grabButton]} onPress={() => {}}>
-                <Text style={styles.grabButtonText}>Acknowledge Shift</Text>
-              </TouchableOpacity>
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>THIS WEEK</Text>
+      {confirmedShifts.map((shift) => (
+        <View key={shift.id} style={styles.card}>
+          <View style={styles.left}>
+            <Text style={styles.date}>{shift.date}</Text>
+            <Text style={styles.day}>{shift.day}</Text>
+          </View>
+          <View style={styles.right}>
+            <View style={styles.headerRow}>
+              <Text style={styles.orgName}>{shift.orgName}</Text>
+              <View style={styles.locationTag}>
+                <Text style={styles.locationText}>{shift.location}</Text>
+              </View>
             </View>
-    </View>
+            <Text style={styles.orgDesc}>{shift.orgDesc}</Text>
+            <Text style={styles.time}>
+              {shift.time} | {shift.duration}
+            </Text>
+            <Text style={styles.detail}>Shift: {shift.shift}</Text>
+          </View>
+        </View>
+      ))}
+    </ScrollView>
   );
 };
 
-export default ConfirmedShift;
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
     padding: 16,
-    paddingBottom: 100,
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-    gap: 6,
-  },
-  addLeaveText: {
-    color: "#14A2E2",
-    fontWeight: "600",
-  },
-  weekHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  weekText: {
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "#1E1E1E",
-  },
-  card: {
-    borderRadius: 12,
-    elevation: 2,
-    marginBottom: 16,
+    backgroundColor: '#f4f4f4',
+    flex: 1,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2d3d',
+    marginBottom: 12,
   },
-  avatar: {
-    backgroundColor: "#E98024",
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 2,
+  },
+  left: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 50,
     marginRight: 12,
-    fontSize: 12,
-    fontWeight: "bold",
   },
-  info: {
+  date: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2d3d',
+  },
+  day: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1f2d3d',
+  },
+  right: {
     flex: 1,
   },
-  title: {
-    fontWeight: "bold",
-    fontSize: 15,
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  subtitle: {
-    color: "gray",
+  orgName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2d3d',
   },
-  orgCode: {
-    borderWidth: 1,
+  orgDesc: {
+    color: '#6c757d',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  locationTag: {
+    backgroundColor: '#f1f3f5',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+  },
+  locationText: {
     fontSize: 12,
-    fontWeight: "bold",
+    color: '#1f2d3d',
   },
-  divider: {
-    marginVertical: 12,
+  time: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#1f2d3d',
   },
-  details: {
-    gap: 4,
-  },
-  shiftTime: {
-    fontWeight: "bold",
+  detail: {
+    color: '#4b4b4b',
     fontSize: 14,
   },
-  acknowledgeContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-  },
-  acknowledgeButton: {
-    borderRadius: 10,
-  },
-  grabButton: {
-    backgroundColor: "#14A2E2",
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  grabButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-
 });
+
+export default ConfirmedShiftScreen;

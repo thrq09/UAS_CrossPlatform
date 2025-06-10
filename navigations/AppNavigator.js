@@ -5,6 +5,9 @@ import OrganisationDetailScreen from "../screens/more/component/OrganisationDeta
 import NotificationScreen from "../screens/notifications/NotificationScreen";
 import ProfileScreen from "../screens/more/profile/ProfileScreen";
 import LocationScreen from "../screens/LocationScreen";
+import MyLeavesScreen from "../screens/more/MyLeavesScreen";
+import MyPayslipScreen from "../screens/more/MyPayslipScreen";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +19,8 @@ const AppNavigator = () => {
       <Stack.Screen name="Notification" component={NotificationScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Location" component={LocationScreen} />
+      <Stack.Screen name="MyLeaves" component={MyLeavesScreen} />
+      <Stack.Screen name="MyPayslip" component={MyPayslipScreen} />
     </Stack.Navigator>
   );
 };

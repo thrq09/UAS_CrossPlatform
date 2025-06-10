@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { Avatar, Text, Divider, IconButton } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import useAuthStore from "../../stores/useAuthStore";
+import { useNavigation } from "@react-navigation/native";
+import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { db, auth } from "../../firebase/config";
+import { useAuth } from "../auth/AuthContext";
 import useOrgStore from "../../stores/useOrgStore";
 import OrganisationModal from "./component/OrganisationModal";
-import { useNavigation } from "@react-navigation/native";
 
 const MenuItem = ({ icon, label, onPress }) => (
   <>
@@ -18,11 +21,50 @@ const MenuItem = ({ icon, label, onPress }) => (
 );
 
 const MoreScreen = () => {
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const navigation = useNavigation();
+  const { user } = useAuth(); // contains uid
   const { selectedOrg } = useOrgStore();
   const [modalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation();
+  const [userData, setUserData] = useState(null);
+
+  const fetchUserData = async () => {
+    if (!user?.uid) return;
+    try {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              await signOut(auth);
+            } catch (error) {
+              console.error("Logout failed:", error);
+            }
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <>
@@ -30,9 +72,11 @@ const MoreScreen = () => {
         <View style={styles.userInfo}>
           <Avatar.Image
             size={72}
-            source={{ uri: user?.profilePic || "https://i.pravatar.cc/300" }}
+            source={{
+              uri: userData?.profilePic || "https://i.pravatar.cc/300",
+            }}
           />
-          <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
+          <Text style={styles.userName}>{userData?.name || "Guest"}</Text>
           <IconButton
             icon="bell-outline"
             size={22}
@@ -40,11 +84,7 @@ const MoreScreen = () => {
           />
         </View>
 
-        <MenuItem
-          icon="account"
-          label="Profile"
-          onPress={() => navigation.navigate("Profile")}
-        />  
+        <MenuItem icon="account" label="Profile" onPress={() => navigation.navigate("Profile")} />
         <MenuItem icon="leaf" label="My Leaves" />
         <MenuItem icon="file-document" label="My Payslip" />
 
@@ -56,12 +96,7 @@ const MoreScreen = () => {
         </View>
 
         <View style={styles.orgInfo}>
-          <Icon
-            name="office-building"
-            size={30}
-            color="#333"
-            style={styles.menuIcon}
-          />
+          <Icon name="office-building" size={30} color="#333" style={styles.menuIcon} />
           <View style={styles.orgTextContainer}>
             <View style={styles.orgNameRow}>
               <Text style={styles.orgName}>{selectedOrg}</Text>
@@ -71,39 +106,18 @@ const MoreScreen = () => {
           </View>
         </View>
         <Divider />
-        
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Others</Text>
         </View>
 
         <MenuItem icon="heart-pulse" label="Get Location" onPress={() => navigation.navigate("Location")} />
-        <MenuItem
-          icon="logout"
-          label="Logout"
-          onPress={() =>
-            Alert.alert(
-              "Logout",
-              "Are you sure you want to logout?",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Yes",
-                  onPress: logout,
-                  style: "destructive",
-                },
-              ],
-              { cancelable: true }
-            )
-          }
-        />
+        <MenuItem icon="logout" label="Logout" onPress={handleLogout} />
 
         <Text style={styles.version}>Version 1.138.0</Text>
       </ScrollView>
 
-      <OrganisationModal
-        visible={modalVisible}
-        onDismiss={() => setModalVisible(false)}
-      />
+      <OrganisationModal visible={modalVisible} onDismiss={() => setModalVisible(false)} />
     </>
   );
 };

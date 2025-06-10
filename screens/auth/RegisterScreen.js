@@ -8,6 +8,8 @@ import { auth, db } from "../../firebase/config";
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = async () => {
@@ -25,6 +27,8 @@ const RegisterScreen = ({ navigation }) => {
         uid,
         name,
         email,
+        phoneNumber,
+        address,
         profilePic: "https://i.pravatar.cc/150?u=" + uid,
       });
 
@@ -37,7 +41,9 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Nama" value={name} onChangeText={setName} style={styles.input} />
+      <TextInput placeholder="Full Name" value={name} onChangeText={setName} style={styles.input} />
+      <TextInput placeholder="Phone Number" value={phoneNumber} onChangeText={setPhoneNumber} style={styles.input} />
+      <TextInput placeholder="Address" value={address} onChangeText={setAddress} style={styles.input} />
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
       <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />
       <Button title="Register" onPress={handleRegister} />

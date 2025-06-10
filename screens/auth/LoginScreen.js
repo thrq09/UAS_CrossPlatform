@@ -1,15 +1,23 @@
 // screens/auth/LoginScreen.js
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Alert, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
-import { useAuth } from "../../screens/auth/AuthContext";
+import { useAuth } from "./AuthContext";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(""); // Ganti dari username ke email
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login } = useAuth(); // Ambil fungsi login dari context
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -26,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        login(docSnap.data()); // set ke context
+        login(docSnap.data()); // Simpan user ke context global
       } else {
         Alert.alert("Gagal", "Data profil tidak ditemukan.");
       }
@@ -37,14 +45,36 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
-      <TextInput placeholder="Password" value={password} secureTextEntry onChangeText={setPassword} style={styles.input} />
-      <Button title="Login" onPress={handleLogin} />
+      <Image
+        source={require("../../assets/logo-shiftease.jpeg")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>Login here</Text>
+      <Text style={styles.subtitle}>Welcome back you’ve been missed!</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Sign in</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-        <Text style={styles.registerText}>
-          Belum punya akun? <Text style={styles.link}>Register</Text>
-        </Text>
+        <Text style={styles.createAccountText}>Create new account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -53,20 +83,54 @@ const LoginScreen = ({ navigation }) => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "#fff",
+  },
+  logo: {
+    width: 140,
+    height: 140,
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#004AAD",
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 24,
+    color: "#666",
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 20,
-    padding: 10,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 16,
+    fontSize: 16,
   },
-  registerText: {
-    marginTop: 20,
-    textAlign: "center",
-    color: "#333",
+  button: {
+    backgroundColor: "#004AAD",
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 16,
   },
-  link: {
-    color: "#007bff",
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  createAccountText: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#333",
   },
 });

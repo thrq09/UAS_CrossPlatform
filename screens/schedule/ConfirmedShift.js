@@ -1,61 +1,141 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Text, Card, Avatar, Divider } from "react-native-paper";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../firebase/config";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
-const confirmedShifts = [
-  {
-    id: '1',
-    date: 'Thu',
-    day: '12',
-    orgName: 'UKI Matcha PURI',
-    orgDesc: 'Uki Matcha Puri',
-    location: 'PURI',
-    time: '08:00 - 16:00',
-    duration: '8h',
-    department: 'Kitchen',
-    shift: 'open kitchen',
-  },
-  {
-    id: '2',
-    date: 'Sat',
-    day: '14',
-    orgName: 'UKI Matcha PURI',
-    orgDesc: 'Uki Matcha Puri',
-    location: 'PURI',
-    time: '12:00 - 20:00',
-    duration: '8h',
-    department: 'Kitchen',
-    shift: 'middle kitchen',
-  },
-];
-
-const ConfirmedShiftScreen = () => {
-  return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>THIS WEEK</Text>
-      {confirmedShifts.map((shift) => (
-        <View key={shift.id} style={styles.card}>
-          <View style={styles.left}>
-            <Text style={styles.date}>{shift.date}</Text>
-            <Text style={styles.day}>{shift.day}</Text>
-          </View>
-          <View style={styles.right}>
-            <View style={styles.headerRow}>
-              <Text style={styles.orgName}>{shift.orgName}</Text>
-              <View style={styles.locationTag}>
-                <Text style={styles.locationText}>{shift.location}</Text>
-              </View>
-            </View>
-            <Text style={styles.orgDesc}>{shift.orgDesc}</Text>
-            <Text style={styles.time}>
-              {shift.time} | {shift.duration}
-            </Text>
-            <Text style={styles.detail}>Shift: {shift.shift}</Text>
-          </View>
+const ShiftCard = ({ schedule }) => (
+  <Card style={styles.card}>
+    <Card.Content>
+      <View style={styles.header}>
+        <Avatar.Text size={36} label={schedule.organizationCode || "ORG"} style={styles.avatar} />
+        <View style={styles.info}>
+          <Text style={styles.title}>{schedule.organizationName}</Text>
+          <Text style={styles.subtitle}>{schedule.organizationName}</Text>
         </View>
-      ))}
-    </ScrollView>
+        <Text style={styles.orgCode}>{schedule.organizationCode || "ORG"}</Text>
+      </View>
+
+      <Divider style={styles.divider} />
+
+      <View style={styles.details}>
+        <Text style={styles.shiftTime}>
+          {schedule.startTime} - {schedule.endTime} | {schedule.duration}h
+        </Text>
+        <Text>
+          ☕ {schedule.breakDuration}m <Text style={{ fontWeight: "bold" }}>{schedule.department || "Kitchen"}</Text>
+        </Text>
+        <Text>
+          Shift: <Text style={{ fontWeight: "bold" }}>{schedule.shiftName || "closing 2"}</Text>
+        </Text>
+      </View>
+    </Card.Content>
+  </Card>
+);
+
+const ConfirmedShift = () => {
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const toggleDropdown = () => setIsExpanded(!isExpanded);
+
+  // Function to fetch schedules from Firestore
+  const fetchSchedules = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) {
+        console.log("User not logged in");
+        setLoading(false);
+        return;
+      }
+
+      const schedulesCol = collection(db, "users", user.uid, "schedules");
+      const snapshot = await getDocs(schedulesCol);
+
+      const fetchedSchedules = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setSchedules(fetchedSchedules);
+    } catch (error) {
+      console.error("Failed to fetch schedules:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addStaticSchedule = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const schedulesCol = collection(db, "users", user.uid, "schedules");
+
+      await addDoc(schedulesCol, {
+        organizationName: "Uki Matcha SCBD",
+        organizationCode: "UMS",
+        date: "10-06-2025",
+        startTime: "17:00",
+        endTime: "23:00",
+        duration: 6,
+        breakDuration: 30,
+        department: "Kitchen",
+        shiftName: "closing 2",
+      });
+      console.log("Static schedule added!");
+    } catch (error) {
+      console.error("Error adding static schedule:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSchedules();
+    addStaticSchedule();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Add Leave Button */}
+        <TouchableOpacity style={styles.actionsContainer}>
+          <Icon name="plus-circle-outline" size={20} color="#14A2E2" />
+          <Text style={styles.addLeaveText}>Add Leave</Text>
+        </TouchableOpacity>
+
+        {/* THIS WEEK + Toggle */}
+        <View style={styles.weekHeader}>
+          <Text style={styles.weekText}>THIS WEEK</Text>
+          <TouchableOpacity onPress={toggleDropdown}>
+            <Icon name={isExpanded ? "chevron-up" : "chevron-down"} size={24} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Loading indicator */}
+        {loading && <ActivityIndicator size="large" color="#14A2E2" style={{ marginTop: 20 }} />}
+
+        {/* List of Schedules */}
+        {isExpanded &&
+          !loading &&
+          (schedules.length > 0 ? (
+            schedules.map((schedule) => <ShiftCard key={schedule.id} schedule={schedule} />)
+          ) : (
+            <Text style={{ textAlign: "center", marginTop: 20 }}>No schedules available.</Text>
+          ))}
+      </ScrollView>
+
+      {/* Acknowledge Button */}
+      <View style={styles.acknowledgeContainer}>
+        <TouchableOpacity style={[styles.acknowledgeButton, styles.grabButton]} onPress={() => {}}>
+          <Text style={styles.grabButtonText}>Acknowledge Shift</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
+
+export default ConfirmedShift;
 
 const styles = StyleSheet.create({
   container: {

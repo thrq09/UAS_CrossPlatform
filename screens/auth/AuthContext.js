@@ -1,30 +1,36 @@
-import React, { createContext, useState, useContext } from "react";
+// AuthContext.js
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/config"; // sesuaikan path
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // null kalau belum login
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = () => {
-    // Simulasi login
-    const dummyUser = {
-      name: "Adrianus Ezeekiel Dyarsa Amarta",
-      role: "Employee",
-      profilePic: "https://i.pravatar.cc/150?img=12", // avatar dummy
-    };
-    setUser(dummyUser);
+  const login = (userData) => {
+    setUser(userData);
   };
 
   const logout = () => setUser(null);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook
 export const useAuth = () => useContext(AuthContext);
-
-export default AuthContext;

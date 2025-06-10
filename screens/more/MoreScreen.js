@@ -1,24 +1,15 @@
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
-import {
-  Avatar,
-  Text,
-  Divider,
-  IconButton,
-} from "react-native-paper";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { Avatar, Text, Divider, IconButton } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
+import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
-
+import { db, auth } from "../../firebase/config";
+import { useAuth } from "../auth/AuthContext";
 import useOrgStore from "../../stores/useOrgStore";
 import OrganisationModal from "./component/OrganisationModal";
-import { useUserStore } from "../../stores/useUserStore"; // ✅ pakai useUserStore
 
 const MenuItem = ({ icon, label, onPress }) => (
   <>
@@ -32,12 +23,27 @@ const MenuItem = ({ icon, label, onPress }) => (
 
 const MoreScreen = () => {
   const navigation = useNavigation();
+  const { user } = useAuth(); // contains uid
   const { selectedOrg } = useOrgStore();
   const [modalVisible, setModalVisible] = useState(false);
+  const [userData, setUserData] = useState(null);
 
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
-  const updateProfilePic = useUserStore((state) => state.updateProfilePic);
+  const fetchUserData = async () => {
+    if (!user?.uid) return;
+    try {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUserData(docSnap.data());
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -47,8 +53,32 @@ const MoreScreen = () => {
     });
 
     if (!result.canceled && result.assets?.[0]?.uri) {
-      updateProfilePic(result.assets[0].uri);
+      // Update only the local state for now
+      setUserData((prev) => ({ ...prev, profilePic: result.assets[0].uri }));
+      // If you want to save to Firebase as well, add update logic here
     }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              await signOut(auth);
+            } catch (error) {
+              console.error("Logout failed:", error);
+            }
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -58,10 +88,12 @@ const MoreScreen = () => {
           <TouchableOpacity onPress={handlePickImage}>
             <Avatar.Image
               size={72}
-              source={{ uri: user?.profilePic || "https://i.pravatar.cc/300" }}
+              source={{
+                uri: userData?.profilePic || "https://i.pravatar.cc/300",
+              }}
             />
           </TouchableOpacity>
-          <Text style={styles.userName}>{user?.firstName || "Guest"}</Text>
+          <Text style={styles.userName}>{userData?.name || "Guest"}</Text>
           <IconButton
             icon="bell-outline"
             size={22}
@@ -69,21 +101,9 @@ const MoreScreen = () => {
           />
         </View>
 
-        <MenuItem
-          icon="account"
-          label="Profile"
-          onPress={() => navigation.navigate("Profile")}
-        />
-        <MenuItem
-          icon="leaf"
-          label="My Leaves"
-          onPress={() => navigation.navigate("MyLeaves")}
-        />
-        <MenuItem
-          icon="file-document"
-          label="My Payslip"
-          onPress={() => navigation.navigate("MyPayslip")}
-        />
+        <MenuItem icon="account" label="Profile" onPress={() => navigation.navigate("Profile")} />
+        <MenuItem icon="leaf" label="My Leaves" onPress={() => navigation.navigate("MyLeaves")} />
+        <MenuItem icon="file-document" label="My Payslip" onPress={() => navigation.navigate("MyPayslip")} />
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Your Organisation</Text>
@@ -93,12 +113,7 @@ const MoreScreen = () => {
         </View>
 
         <View style={styles.orgInfo}>
-          <Icon
-            name="office-building"
-            size={30}
-            color="#333"
-            style={styles.menuIcon}
-          />
+          <Icon name="office-building" size={30} color="#333" style={styles.menuIcon} />
           <View style={styles.orgTextContainer}>
             <View style={styles.orgNameRow}>
               <Text style={styles.orgName}>{selectedOrg}</Text>
@@ -113,36 +128,13 @@ const MoreScreen = () => {
           <Text style={styles.sectionTitle}>Others</Text>
         </View>
 
-        <MenuItem
-          icon="heart-pulse"
-          label="Get Location"
-          onPress={() => navigation.navigate("Location")}
-        />
-        <MenuItem
-          icon="logout"
-          label="Logout"
-          onPress={() =>
-            Alert.alert("Logout", "Are you sure you want to logout?", [
-              { text: "Cancel", style: "cancel" },
-              {
-                text: "Yes",
-                onPress: () => {
-                  setUser({}); // kosongkan user saat logout
-                  navigation.replace("Login");
-                },
-                style: "destructive",
-              },
-            ])
-          }
-        />
+        <MenuItem icon="heart-pulse" label="Get Location" onPress={() => navigation.navigate("Location")} />
+        <MenuItem icon="logout" label="Logout" onPress={handleLogout} />
 
         <Text style={styles.version}>Version 1.138.0</Text>
       </ScrollView>
 
-      <OrganisationModal
-        visible={modalVisible}
-        onDismiss={() => setModalVisible(false)}
-      />
+      <OrganisationModal visible={modalVisible} onDismiss={() => setModalVisible(false)} />
     </>
   );
 };

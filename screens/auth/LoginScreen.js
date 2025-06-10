@@ -1,3 +1,4 @@
+// screens/auth/LoginScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -8,36 +9,44 @@ import {
   Image,
   Alert,
 } from "react-native";
-import useAuthStore from "../../stores/useAuthStore";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase/config";
+import { useAuth } from "./AuthContext";
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); // Ganti dari username ke email
   const [password, setPassword] = useState("");
-  const login = useAuthStore((state) => state.login);
-  const registeredUser = useAuthStore((state) => state.registeredUser);
+  const { login } = useAuth(); // Ambil fungsi login dari context
 
-  const handleLogin = () => {
-    if (!username || !password) {
+  const handleLogin = async () => {
+    if (!email || !password) {
       Alert.alert("Peringatan", "Email dan password tidak boleh kosong.");
       return;
     }
 
-    if (
-      !registeredUser ||
-      registeredUser.username !== username ||
-      registeredUser.password !== password
-    ) {
-      Alert.alert("Gagal", "Email atau password salah.");
-      return;
-    }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
 
-    login(username, password);
+      // Ambil data user dari Firestore
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        login(docSnap.data()); // Simpan user ke context global
+      } else {
+        Alert.alert("Gagal", "Data profil tidak ditemukan.");
+      }
+    } catch (error) {
+      Alert.alert("Login Gagal", error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../assets/logo-shiftease.jpeg")} // Pastikan gambar logo berada di path ini
+        source={require("../../assets/logo-shiftease.jpeg")}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -47,8 +56,10 @@ const LoginScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}

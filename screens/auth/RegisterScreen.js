@@ -8,28 +8,48 @@ import {
   Image,
   Alert,
 } from "react-native";
-import useAuthStore from "../../stores/useAuthStore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase/config";
 
 const RegisterScreen = ({ navigation }) => {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const register = useAuthStore((state) => state.register);
 
-  const handleRegister = () => {
-    if (!username || !password) {
-      Alert.alert("Peringatan", "Email dan password tidak boleh kosong.");
+  const handleRegister = async () => {
+    if (!email || !password || !name) {
+      Alert.alert("Peringatan", "Nama, Email, dan Password wajib diisi.");
       return;
     }
 
-    register(username, password);
-    Alert.alert("Sukses", "Registrasi berhasil! Silakan login.");
-    navigation.navigate("Login");
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+
+      // Simpan data ke Firestore
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        name,
+        email,
+        phoneNumber,
+        address,
+        profilePic: "https://i.pravatar.cc/150?u=" + uid,
+      });
+
+      Alert.alert("Sukses", "Registrasi berhasil! Silakan login.");
+      navigation.navigate("Login");
+    } catch (error) {
+      Alert.alert("Gagal", error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../assets/logo-shiftease.jpeg")} // Pastikan path ini sesuai lokasi gambar logo
+        source={require("../../assets/logo-shiftease.jpeg")}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -38,9 +58,30 @@ const RegisterScreen = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
+        placeholder="Full Name"
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Phone Number"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Address"
+        value={address}
+        onChangeText={setAddress}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="Email"
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}

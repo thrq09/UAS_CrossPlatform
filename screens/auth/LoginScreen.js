@@ -1,46 +1,44 @@
+// screens/auth/LoginScreen.js
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet, Alert, Text, TouchableOpacity } from "react-native";
-import useAuthStore from "../../stores/useAuthStore";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase/config";
+import { useAuth } from "../../screens/auth/AuthContext";
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const login = useAuthStore((state) => state.login);
-  const registeredUser = useAuthStore((state) => state.registeredUser);
+  const { login } = useAuth();
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      Alert.alert("Peringatan", "Username dan password tidak boleh kosong.");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Peringatan", "Email dan password tidak boleh kosong.");
       return;
     }
 
-    if (
-      !registeredUser ||
-      registeredUser.username !== username ||
-      registeredUser.password !== password
-    ) {
-      Alert.alert("Gagal", "Username atau password salah.");
-      return;
-    }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
 
-    login(username, password);
+      // Ambil data user dari Firestore
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        login(docSnap.data()); // set ke context
+      } else {
+        Alert.alert("Gagal", "Data profil tidak ditemukan.");
+      }
+    } catch (error) {
+      Alert.alert("Login Gagal", error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-        style={styles.input}
-      />
+      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
+      <TextInput placeholder="Password" value={password} secureTextEntry onChangeText={setPassword} style={styles.input} />
       <Button title="Login" onPress={handleLogin} />
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>

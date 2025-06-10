@@ -6,12 +6,13 @@ import { Provider as PaperProvider } from "react-native-paper";
 import LoginScreen from "./screens/auth/LoginScreen";
 import RegisterScreen from "./screens/auth/RegisterScreen";
 import AppNavigator from "./navigations/AppNavigator";
-import useAuthStore from "./stores/useAuthStore";
+import { useAuth } from "./screens/auth/AuthContext";
+import { AuthProvider } from "./screens/auth/AuthContext";
 
 const Stack = createNativeStackNavigator();
 
 const AppContent = () => {
-  const user = useAuthStore((state) => state.user);
+  const { user } = useAuth(); // <- Use context to check auth state
 
   return (
     <NavigationContainer>
@@ -31,8 +32,10 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <PaperProvider>
-      <AppContent />
-    </PaperProvider>
+    <AuthProvider>
+      <PaperProvider>
+        <AppContent />
+      </PaperProvider>
+    </AuthProvider>
   );
 }

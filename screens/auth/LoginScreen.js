@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Alert, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from "react-native";
 import useAuthStore from "../../stores/useAuthStore";
 
 const LoginScreen = ({ navigation }) => {
@@ -10,7 +18,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = () => {
     if (!username || !password) {
-      Alert.alert("Peringatan", "Username dan password tidak boleh kosong.");
+      Alert.alert("Peringatan", "Email dan password tidak boleh kosong.");
       return;
     }
 
@@ -19,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
       registeredUser.username !== username ||
       registeredUser.password !== password
     ) {
-      Alert.alert("Gagal", "Username atau password salah.");
+      Alert.alert("Gagal", "Email atau password salah.");
       return;
     }
 
@@ -28,25 +36,34 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require("../../assets/logo-shiftease.jpeg")} // Pastikan gambar logo berada di path ini
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>Login here</Text>
+      <Text style={styles.subtitle}>Welcome back you’ve been missed!</Text>
+
       <TextInput
-        placeholder="Username"
+        style={styles.input}
+        placeholder="Email"
         value={username}
         onChangeText={setUsername}
-        style={styles.input}
       />
       <TextInput
+        style={styles.input}
         placeholder="Password"
         value={password}
-        secureTextEntry
         onChangeText={setPassword}
-        style={styles.input}
+        secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} />
+
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Sign in</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-        <Text style={styles.registerText}>
-          Belum punya akun? <Text style={styles.link}>Register</Text>
-        </Text>
+        <Text style={styles.createAccountText}>Create new account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -55,20 +72,54 @@ const LoginScreen = ({ navigation }) => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "#fff",
+  },
+  logo: {
+    width: 140,
+    height: 140,
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#004AAD",
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 24,
+    color: "#666",
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 20,
-    padding: 10,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 16,
+    fontSize: 16,
   },
-  registerText: {
-    marginTop: 20,
-    textAlign: "center",
-    color: "#333",
+  button: {
+    backgroundColor: "#004AAD",
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 16,
   },
-  link: {
-    color: "#007bff",
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  createAccountText: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#333",
   },
 });

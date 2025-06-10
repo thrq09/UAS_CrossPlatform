@@ -20,8 +20,6 @@ const DailyScreen = () => {
     startTime: "10:00",
     endTime: "19:00",
     totalHours: "9",
-    breakTime: 30,
-    breakUsed: 0,
     shiftType: "middle",
     role: "Kitchen",
   };
@@ -66,12 +64,8 @@ const DailyScreen = () => {
         <Text style={styles.time}>
           (Today) {shift.startTime} - {shift.endTime} | {shift.totalHours}h
         </Text>
-        <Text style={styles.break}>☕ {shift.breakTime} mins</Text>
         <Text style={styles.label}>{shift.role}</Text>
         <Text style={styles.label}>Shift: {shift.shiftType}</Text>
-        <Text style={styles.breakUsage}>
-          • You have used {shift.breakUsed} / {shift.breakTime} mins of unpaid break
-        </Text>
 
         <TouchableOpacity
           style={[

@@ -12,7 +12,6 @@ const TimesheetCard = ({ item }) => {
     clockIn = "-",
     clockOut = "-",
     duration = "-",
-    break: breakTime = "0 mins",
   } = item;
 
   const clockTime = time || `${clockIn} - ${clockOut}`.trim();
@@ -24,10 +23,6 @@ const TimesheetCard = ({ item }) => {
           <Badge style={styles.badge}>{location}</Badge>
           <Text style={styles.date}>{date}</Text>
           <Text style={styles.totalHours}>{duration}</Text>
-        </View>
-
-        <View style={styles.breakRow}>
-          <Text style={styles.breakText}>Break: {breakTime}</Text>
         </View>
 
         <View style={styles.timeRow}>
@@ -63,12 +58,6 @@ const styles = StyleSheet.create({
   totalHours: {
     color: "#144b8e",
     fontWeight: "bold",
-  },
-  breakRow: {
-    marginTop: 8,
-  },
-  breakText: {
-    color: "#555",
   },
   timeRow: {
     marginTop: 4,

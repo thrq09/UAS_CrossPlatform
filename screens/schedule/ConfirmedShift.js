@@ -137,101 +137,80 @@ const ConfirmedShift = () => {
 
 export default ConfirmedShift;
 
-// styles stay the same
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
     padding: 16,
-    paddingBottom: 100,
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-    gap: 6,
-  },
-  addLeaveText: {
-    color: "#14A2E2",
-    fontWeight: "600",
-  },
-  weekHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  weekText: {
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "#1E1E1E",
-  },
-  card: {
-    borderRadius: 12,
-    elevation: 2,
-    marginBottom: 16,
+    backgroundColor: '#f4f4f4',
+    flex: 1,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2d3d',
+    marginBottom: 12,
   },
-  avatar: {
-    backgroundColor: "#E98024",
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 2,
+  },
+  left: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 50,
     marginRight: 12,
-    fontSize: 12,
-    fontWeight: "bold",
   },
-  info: {
+  date: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2d3d',
+  },
+  day: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1f2d3d',
+  },
+  right: {
     flex: 1,
   },
-  title: {
-    fontWeight: "bold",
-    fontSize: 15,
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  subtitle: {
-    color: "gray",
+  orgName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1f2d3d',
   },
-  orgCode: {
-    borderWidth: 1,
+  orgDesc: {
+    color: '#6c757d',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  locationTag: {
+    backgroundColor: '#f1f3f5',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+  },
+  locationText: {
     fontSize: 12,
-    fontWeight: "bold",
+    color: '#1f2d3d',
   },
-  divider: {
-    marginVertical: 12,
+  time: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#1f2d3d',
   },
-  details: {
-    gap: 4,
-  },
-  shiftTime: {
-    fontWeight: "bold",
+  detail: {
+    color: '#4b4b4b',
     fontSize: 14,
   },
-  acknowledgeContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-  },
-  acknowledgeButton: {
-    borderRadius: 10,
-  },
-  grabButton: {
-    backgroundColor: "#14A2E2",
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  grabButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
 });
+
+export default ConfirmedShiftScreen;

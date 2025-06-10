@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import { doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
+import * as ImagePicker from "expo-image-picker";
 import { db, auth } from "../../firebase/config";
 import { useAuth } from "../auth/AuthContext";
 import useOrgStore from "../../stores/useOrgStore";
@@ -44,6 +45,20 @@ const MoreScreen = () => {
     fetchUserData();
   }, []);
 
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets?.[0]?.uri) {
+      // Update only the local state for now
+      setUserData((prev) => ({ ...prev, profilePic: result.assets[0].uri }));
+      // If you want to save to Firebase as well, add update logic here
+    }
+  };
+
   const handleLogout = () => {
     Alert.alert(
       "Logout",
@@ -70,12 +85,14 @@ const MoreScreen = () => {
     <>
       <ScrollView style={styles.container}>
         <View style={styles.userInfo}>
-          <Avatar.Image
-            size={72}
-            source={{
-              uri: userData?.profilePic || "https://i.pravatar.cc/300",
-            }}
-          />
+          <TouchableOpacity onPress={handlePickImage}>
+            <Avatar.Image
+              size={72}
+              source={{
+                uri: userData?.profilePic || "https://i.pravatar.cc/300",
+              }}
+            />
+          </TouchableOpacity>
           <Text style={styles.userName}>{userData?.name || "Guest"}</Text>
           <IconButton
             icon="bell-outline"
@@ -85,8 +102,8 @@ const MoreScreen = () => {
         </View>
 
         <MenuItem icon="account" label="Profile" onPress={() => navigation.navigate("Profile")} />
-        <MenuItem icon="leaf" label="My Leaves" />
-        <MenuItem icon="file-document" label="My Payslip" />
+        <MenuItem icon="leaf" label="My Leaves" onPress={() => navigation.navigate("MyLeaves")} />
+        <MenuItem icon="file-document" label="My Payslip" onPress={() => navigation.navigate("MyPayslip")} />
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Your Organisation</Text>
